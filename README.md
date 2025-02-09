@@ -2,8 +2,11 @@
 A question-answering framework based on NebulaGraphQAChain (langchain) and deepseek (siliconflow)
 
 Configuration environment used：
+
 Ubuntu 20.04
+
 Nebula Graph 2025.01.13-nightly
+
 Python 3.10.16
 
 After downloading the code, enter the code file:NebulaGraphQAChain.py
