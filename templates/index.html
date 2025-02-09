@@ -1,0 +1,213 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>NebulaGraph QA 系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            overflow: hidden; /* 以防止滚动产生外部滚动条 */
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            height: 100vh;
+        }
+
+        .chat-section {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .logs-section {
+            flex: 1;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+        }
+
+        #question-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        .message {
+            max-width: 80%;
+            margin: 10px 0;
+            padding: 15px 20px;
+            border-radius: 15px;
+            line-height: 1.6;
+        }
+
+        .user-message {
+            background: #e3f2fd;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-right: auto;
+        }
+
+        /* 日志容器本身 */
+        #log-container {
+            word-break: break-all;
+        }
+
+        /* 每条日志条目使用 pre-wrap 保留换行符 */
+        .log-line {
+            white-space: pre-wrap;
+            margin-bottom: 0.4em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-section">
+            <div id="chat-box" class="markdown-body"></div>
+            <div class="input-container">
+                <input type="text" id="question-input" placeholder="输入您的问题..." autocomplete="off">
+                <button onclick="askQuestion()">发送</button>
+            </div>
+        </div>
+        <div class="logs-section">
+            <h3 style="color: #fff; margin-bottom: 15px;">系统日志</h3>
+            <div id="log-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // 对话管理：向聊天窗口追加消息
+        function appendMessage(content, isUser = false) {
+            const chatBox = document.getElementById('chat-box');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            messageDiv.innerHTML = content;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return messageDiv; // 返回这条消息的DOM节点，以便后续操作
+        }
+
+        // 日志管理：向系统日志窗口追加日志
+        function appendLog(log) {
+            const logContainer = document.getElementById('log-container');
+            const logEntry = document.createElement('div');
+            logEntry.style.color = log.includes('ERROR') ? '#ff4444' : '#4CAF50';
+            logEntry.classList.add('log-line');
+            logEntry.textContent = log;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // SSE 日志监听
+        const eventSource = new EventSource('/logs');
+        eventSource.onmessage = (e) => {
+            appendLog(e.data);
+        };
+
+        // 提问处理
+        async function askQuestion() {
+            const input = document.getElementById('question-input');
+            const question = input.value.trim();
+            if (!question) return;
+
+            // 先显示用户输入
+            appendMessage(`<strong>您:</strong> ${escapeHtml(question)}`, true);
+            input.value = '';
+
+            // 显示一个“AI 正在思考...”的提示
+            const thinkingMessage = appendMessage(`<strong>AI 正在思考...</strong>`);
+
+            try {
+                // 发起后端请求
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ question })
+                });
+
+                const data = await response.json();
+
+                // 收到结果后，移除“正在思考...”的提示
+                thinkingMessage.remove();
+
+                if (data.success) {
+                    // 显示真正的回答
+                    appendMessage(`<strong>AI:</strong>\n${data.response}`);
+                } else {
+                    appendMessage(`<span style="color:red">错误:</span> ${escapeHtml(data.error)}`);
+                }
+            } catch (error) {
+                // 出现网络或其他错误时，也要移除“正在思考...”
+                thinkingMessage.remove();
+                appendMessage(`<span style="color:red">请求失败:</span> ${escapeHtml(error.message)}`);
+            }
+        }
+
+        // 支持回车键
+        document.getElementById('question-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askQuestion();
+        });
+
+        // HTML转义函数
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>
