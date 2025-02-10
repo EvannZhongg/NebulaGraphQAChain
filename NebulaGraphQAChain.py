@@ -1,12 +1,25 @@
+from langchain.chains import NebulaGraphQAChain
+from langchain_community.graphs import NebulaGraph
+from langchain_core.runnables import Runnable
+from langchain_core.prompt_values import StringPromptValue  
 import json
 import requests
+import os
 from flask import Flask, request, jsonify, Response, send_from_directory
 from queue import Queue
 import sys
-import re
+from dotenv import load_dotenv
 
-# ========== 1. Monkey-Patch print 函数，用来捕获所有控制台输出到队列 ==========
+# ========== 1. 读取 .env 配置 ==========
+load_dotenv()  # 读取 .env 文件
 
+CHAT_API_URL = os.getenv("CHAT_API_URL")
+API_KEY = os.getenv("API_KEY")
+
+if not CHAT_API_URL or not API_KEY:
+    raise ValueError("请在 .env 文件中正确配置 CHAT_API_URL 和 API_KEY")
+
+# ========== 2. Monkey-Patch print 函数，用来捕获所有控制台输出到队列 ==========
 log_queue = Queue()
 original_print = print  # 先保存原生 print
 
@@ -24,16 +37,7 @@ def custom_print(*args, **kwargs):
 print = custom_print
 
 
-# ========== 2. 以下为你原先的 NebulaGraphQAChain 相关逻辑，保持不变 ==========
-
-from langchain.chains import NebulaGraphQAChain
-from langchain_community.graphs import NebulaGraph
-from langchain_core.runnables import Runnable
-from langchain_core.prompt_values import StringPromptValue  # 导入 StringPromptValue
-
-# 配置你的 API 信息
-CHAT_API_URL = "https://api.siliconflow.cn/v1/chat/completions"
-API_KEY = "sk-********************************r"  # 替换为你的 API 密钥
+# ========== 3. NebulaGraphQAChain 相关逻辑 ==========
 
 def call_chat_api(prompt):
     """
@@ -94,7 +98,7 @@ class CustomChatModel(Runnable):
 
 # 初始化 NebulaGraph 连接
 graph = NebulaGraph(
-    space="datesheet_csv",
+    space="SPACE",
     username="root",
     password="nebula",
     address="127.0.0.1",
@@ -114,8 +118,7 @@ chain = NebulaGraphQAChain.from_llm(
 )
 
 
-# ========== 3. Flask 后端路由逻辑，用以配合前端对话可视化 ==========
-
+# ========== 4. Flask 后端路由逻辑 ==========
 app = Flask(__name__)
 
 @app.route("/")
@@ -154,7 +157,12 @@ def ask():
     print(f"用户提问: {question}")
 
     try:
+        # 先向前端返回 "AI 正在思考..."
+        thinking_message = "AI 正在思考..."
+        log_queue.put(thinking_message)
+
         answer = chain.run(question)  # 这里的 print 也会被记录
+
         print(f"回答: {answer}")
         return jsonify({"success": True, "response": answer})
     except Exception as e:
