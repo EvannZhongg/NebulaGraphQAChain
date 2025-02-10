@@ -79,6 +79,7 @@ http://localhost:5000/
 
 ### 2. Start a Conversation
 Enter your questions in the web interface, and the system will generate responses based on the Nebula Graph database and AI model.
+![image](https://github.com/user-attachments/assets/866cdc78-450b-47a4-9c3a-0917af8f0f6d)
 
 ### 3. Monitor Logs
 You can view the backend log on the frontend page.
