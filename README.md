@@ -14,9 +14,10 @@ The following environment is used:
 ### 1. Clone the Repository
 ```bash
 # Clone the repository to your local machine
-git clone https://github.com/your-repo/NebulaGraphQAChain.git
+git clone https://github.com/EvannZhongg/NebulaGraphQAChain
 cd NebulaGraphQAChain
 ```
+Or you can just download this repository and run it.
 
 ### 2. Install Dependencies
 Make sure you have Python installed, then install the required dependencies:
@@ -25,14 +26,14 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configure API Credentials
-Edit `NebulaGraphQAChain.py` to set up your API credentials and model.
+Edit `NebulaGraphQAChain.py` and `.env` to set up your API credentials and model.
 
 #### API Configuration
-Update the API URL and API Key based on your usage:
+Update the API URL and API Key in `.env` based on your usage:
 ```python
 # SiliconFlow online API call method (modifiable as needed)
-CHAT_API_URL = "https://api.siliconflow.cn/v1/chat/completions"
-API_KEY = "sk-********************************"  # Replace with your API key
+CHAT_API_URL=https://api.siliconflow.cn/v1/chat/completions
+API_KEY=*****************************  # Replace with your API key
 ```
 
 #### Model Selection
@@ -80,7 +81,7 @@ http://localhost:5000/
 Enter your questions in the web interface, and the system will generate responses based on the Nebula Graph database and AI model.
 
 ### 3. Monitor Logs
-You can view the real-time logs in the backend console.
+You can view the backend log on the frontend page.
 
 #### Backend Log View:
 ![Backend Log](https://github.com/user-attachments/assets/06deb529-0524-44bc-aed0-e108efe118e8)
