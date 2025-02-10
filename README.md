@@ -17,6 +17,17 @@ Fill in the API url and API key based on your needs:
 CHAT_API_URL = "https://api.siliconflow.cn/v1/chat/completions"  
 API_KEY = "sk-********************************"  # Replace with your API key
 ```
+Select the model to use (default is deepseek-ai/DeepSeek-V3):
+```
+response = requests.post(
+            CHAT_API_URL,
+            headers={"Authorization": f"Bearer {API_KEY}"},
+            json={
+                "model": "deepseek-ai/DeepSeek-V3",  # Modify the model you need
+                "messages": [{"role": "user", "content": prompt}]
+            }
+        )
+```
 Configure the Nebula Graph space to be connected:
 ```
 graph = NebulaGraph(
@@ -38,4 +49,5 @@ Open your browser and enter the URL:
 http://localhost:5000/
 ```
 Enter the question-answering dialogue system
-![image](https://github.com/user-attachments/assets/81880e15-0654-4221-b0af-b5dcfd28490d)
+![image](https://github.com/user-attachments/assets/866cdc78-450b-47a4-9c3a-0917af8f0f6d)
+
