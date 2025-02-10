@@ -1,37 +1,60 @@
 # NebulaGraphQAChain
-A question-answering framework based on NebulaGraphQAChain (langchain) and deepseek (siliconflow)
 
-Configuration environment used：
+## Overview
+NebulaGraphQAChain is a question-answering framework based on NebulaGraph, LangChain, and DeepSeek (SiliconFlow). It enables querying and retrieving structured knowledge stored in a Nebula Graph database using an AI model.
 
-Ubuntu 20.04
+## Environment Configuration
+The following environment is used:
 
-Nebula Graph 2025.01.13-nightly
+- **Operating System:** Ubuntu 20.04
+- **Graph Database:** Nebula Graph 2025.01.13-nightly
+- **Programming Language:** Python 3.10.16
 
-Python 3.10.16
-
-After downloading the code, enter the code file:NebulaGraphQAChain.py
-
-Fill in the API url and API key based on your needs:
+## Installation & Setup
+### 1. Clone the Repository
+```bash
+# Clone the repository to your local machine
+git clone https://github.com/your-repo/NebulaGraphQAChain.git
+cd NebulaGraphQAChain
 ```
-#The example uses the siliconflow online API call method, which can be modified by yourself
-CHAT_API_URL = "https://api.siliconflow.cn/v1/chat/completions"  
+
+### 2. Install Dependencies
+Make sure you have Python installed, then install the required dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Configure API Credentials
+Edit `NebulaGraphQAChain.py` to set up your API credentials and model.
+
+#### API Configuration
+Update the API URL and API Key based on your usage:
+```python
+# SiliconFlow online API call method (modifiable as needed)
+CHAT_API_URL = "https://api.siliconflow.cn/v1/chat/completions"
 API_KEY = "sk-********************************"  # Replace with your API key
 ```
-Select the model to use (default is deepseek-ai/DeepSeek-V3):
-```
+
+#### Model Selection
+Modify the model you need (default: `deepseek-ai/DeepSeek-V3`):
+```python
 response = requests.post(
-            CHAT_API_URL,
-            headers={"Authorization": f"Bearer {API_KEY}"},
-            json={
-                "model": "deepseek-ai/DeepSeek-V3",  # Modify the model you need
-                "messages": [{"role": "user", "content": prompt}]
-            }
-        )
+    CHAT_API_URL,
+    headers={"Authorization": f"Bearer {API_KEY}"},
+    json={
+        "model": "deepseek-ai/DeepSeek-V3",  # Change to the desired model
+        "messages": [{"role": "user", "content": prompt}]
+    }
+)
 ```
-Configure the Nebula Graph space to be connected:
-```
+
+### 4. Configure Nebula Graph Connection
+Modify the Nebula Graph connection settings in `NebulaGraphQAChain.py`:
+```python
+from nebula3.gclient.net import NebulaGraph
+
 graph = NebulaGraph(
-    space="SPACE",  #Change to the space you need to use
+    space="YOUR_SPACE",  # Change to the Nebula Graph space you need
     username="root",
     password="nebula",
     address="127.0.0.1",
@@ -39,22 +62,41 @@ graph = NebulaGraph(
     session_pool_size=30,
 )
 ```
-Run the code after making all the changes:
-```
+
+## Running the Application
+After configuring the necessary settings, run the application:
+```bash
 python NebulaGraphQAChain.py
 ```
 
-Open your browser and enter the URL:
+## Usage
+### 1. Open the Web Interface
+Once the script is running, open your browser and enter:
 ```
 http://localhost:5000/
 ```
-Enter the question-answering dialogue system, and enter your question
-![image](https://github.com/user-attachments/assets/866cdc78-450b-47a4-9c3a-0917af8f0f6d)
 
-You can view the status in the backend log on the right:
-![image](https://github.com/user-attachments/assets/06deb529-0524-44bc-aed0-e108efe118e8)
+### 2. Start a Conversation
+Enter your questions in the web interface, and the system will generate responses based on the Nebula Graph database and AI model.
 
-To view the specific nGQL statement, please view it in the IDE terminal:
-![image](https://github.com/user-attachments/assets/fefb7d40-9737-4dc1-a3d0-266445ccc65a)
+### 3. Monitor Logs
+You can view the real-time logs in the backend console.
 
+#### Backend Log View:
+![Backend Log](https://github.com/user-attachments/assets/06deb529-0524-44bc-aed0-e108efe118e8)
 
+#### nGQL Query Execution:
+To inspect the generated nGQL queries, check the terminal:
+![Query Execution](https://github.com/user-attachments/assets/fefb7d40-9737-4dc1-a3d0-266445ccc65a)
+
+### 4. Verify Queries in Nebula Graph
+Queries can be directly executed in Nebula Graph for validation:
+![Nebula Graph Query](https://github.com/user-attachments/assets/72b07b88-740e-4210-aaaf-823e29bfb3d1)
+
+## Contribution
+If you wish to contribute, feel free to fork the repository and submit a pull request.
+
+## License
+This project is licensed under the MIT License.
+
+Additionally, this project makes use of [LangChain](https://github.com/hwchase17/langchain), which is licensed under the MIT License.
