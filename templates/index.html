@@ -1,4 +1,3 @@
-<!-- templates/index.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -101,13 +100,14 @@
 
         /* 日志容器本身 */
         #log-container {
+            /* 允许自动换行 */
             word-break: break-all;
         }
 
         /* 每条日志条目使用 pre-wrap 保留换行符 */
         .log-line {
             white-space: pre-wrap;
-            margin-bottom: 0.4em;
+            margin-bottom: 0.4em; /* 让每条日志在视觉上稍微分隔 */
         }
     </style>
 </head>
@@ -127,7 +127,7 @@
     </div>
 
     <script>
-        // 对话管理：向聊天窗口追加消息
+        // 对话管理
         function appendMessage(content, isUser = false) {
             const chatBox = document.getElementById('chat-box');
             const messageDiv = document.createElement('div');
@@ -135,23 +135,29 @@
             messageDiv.innerHTML = content;
             chatBox.appendChild(messageDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
-            return messageDiv; // 返回这条消息的DOM节点，以便后续操作
         }
 
-        // 日志管理：向系统日志窗口追加日志
+        // 日志管理
         function appendLog(log) {
             const logContainer = document.getElementById('log-container');
+            // 创建日志条目 div
             const logEntry = document.createElement('div');
+            // 设为绿色或红色
             logEntry.style.color = log.includes('ERROR') ? '#ff4444' : '#4CAF50';
+            // 保证换行符被显示
             logEntry.classList.add('log-line');
+            // 用 textContent 赋值，以原样保留换行
             logEntry.textContent = log;
             logContainer.appendChild(logEntry);
+
+            // 自动滚动到底部
             logContainer.scrollTop = logContainer.scrollHeight;
         }
 
-        // SSE 日志监听
+        // SSE日志监听
         const eventSource = new EventSource('/logs');
         eventSource.onmessage = (e) => {
+            // e.data 就是后端传来的单条日志
             appendLog(e.data);
         };
 
@@ -161,15 +167,10 @@
             const question = input.value.trim();
             if (!question) return;
 
-            // 先显示用户输入
             appendMessage(`<strong>您:</strong> ${escapeHtml(question)}`, true);
             input.value = '';
 
-            // 显示一个“AI 正在思考...”的提示
-            const thinkingMessage = appendMessage(`<strong>AI 正在思考...</strong>`);
-
             try {
-                // 发起后端请求
                 const response = await fetch('/ask', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -177,29 +178,22 @@
                 });
 
                 const data = await response.json();
-
-                // 收到结果后，移除“正在思考...”的提示
-                thinkingMessage.remove();
-
                 if (data.success) {
-                    // 显示真正的回答
                     appendMessage(`<strong>AI:</strong>\n${data.response}`);
                 } else {
                     appendMessage(`<span style="color:red">错误:</span> ${escapeHtml(data.error)}`);
                 }
             } catch (error) {
-                // 出现网络或其他错误时，也要移除“正在思考...”
-                thinkingMessage.remove();
                 appendMessage(`<span style="color:red">请求失败:</span> ${escapeHtml(error.message)}`);
             }
         }
 
-        // 支持回车键
+        // 支持回车键发送问题
         document.getElementById('question-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') askQuestion();
         });
 
-        // HTML转义函数
+        // HTML转义
         function escapeHtml(unsafe) {
             return unsafe
                 .replace(/&/g, "&amp;")
