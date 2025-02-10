@@ -19,6 +19,8 @@ cd NebulaGraphQAChain
 ```
 Or you can just download this repository and run it.
 
+`Relationship Visualization.py` is just a test and does not involve the use of NebulaGraphQAChain. You can delete it.
+
 ### 2. Install Dependencies
 Make sure you have Python installed, then install the required dependencies:
 ```bash
