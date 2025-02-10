@@ -48,6 +48,13 @@ Open your browser and enter the URL:
 ```
 http://localhost:5000/
 ```
-Enter the question-answering dialogue system
+Enter the question-answering dialogue system, and enter your question
 ![image](https://github.com/user-attachments/assets/866cdc78-450b-47a4-9c3a-0917af8f0f6d)
+
+You can view the status in the backend log on the right:
+![image](https://github.com/user-attachments/assets/06deb529-0524-44bc-aed0-e108efe118e8)
+
+To view the specific nGQL statement, please view it in the IDE terminal:
+![image](https://github.com/user-attachments/assets/fefb7d40-9737-4dc1-a3d0-266445ccc65a)
+
 
