@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request, jsonify, Response, send_from_directory
 from queue import Queue
 import sys
+import re
 
 # ========== 1. Monkey-Patch print 函数，用来捕获所有控制台输出到队列 ==========
 
@@ -23,7 +24,7 @@ def custom_print(*args, **kwargs):
 print = custom_print
 
 
-# ========== 2. 以下为 NebulaGraphQAChain 相关逻辑 ==========
+# ========== 2. 以下为你原先的 NebulaGraphQAChain 相关逻辑，保持不变 ==========
 
 from langchain.chains import NebulaGraphQAChain
 from langchain_community.graphs import NebulaGraph
@@ -32,7 +33,7 @@ from langchain_core.prompt_values import StringPromptValue  # 导入 StringPromp
 
 # 配置你的 API 信息
 CHAT_API_URL = "https://api.siliconflow.cn/v1/chat/completions"
-API_KEY = "sk-********************************"  # 替换为你的 API 密钥
+API_KEY = "sk-********************************r"  # 替换为你的 API 密钥
 
 def call_chat_api(prompt):
     """
@@ -43,7 +44,7 @@ def call_chat_api(prompt):
             CHAT_API_URL,
             headers={"Authorization": f"Bearer {API_KEY}"},
             json={
-                "model": "deepseek-ai/DeepSeek-R1",  # 选择你的模型
+                "model": "deepseek-ai/DeepSeek-V3",  # 选择你的模型
                 "messages": [{"role": "user", "content": prompt}]
             }
         )
@@ -54,6 +55,13 @@ def call_chat_api(prompt):
             if not result:
                 print("收到空的响应内容")
                 raise ValueError("Received empty response from API")
+            
+            # 新增：去除 Markdown 代码块标记
+            if result.startswith("```nebula") and result.endswith("```"):
+                result = result[len("```nebula"):-len("```")].strip()
+            elif result.startswith("```") and result.endswith("```"):
+                result = result[len("```"):-len("```")].strip()
+            
             return result
         else:
             print(f"API 调用失败: {response.status_code} {response.text}")
@@ -86,7 +94,7 @@ class CustomChatModel(Runnable):
 
 # 初始化 NebulaGraph 连接
 graph = NebulaGraph(
-    space="SPACE",  #更改为需要使用的图空间
+    space="datesheet_csv",
     username="root",
     password="nebula",
     address="127.0.0.1",
