@@ -65,6 +65,12 @@ def call_chat_api(prompt):
                 result = result[len("```nebula"):-len("```")].strip()
             elif result.startswith("```cypher") and result.endswith("```"):
                 result = result[len("```cypher"):-len("```")].strip()
+            elif result.startswith("```sql") and result.endswith("```"):
+                result = result[len("```sql"):-len("```")].strip()
+            elif result.startswith("```diff") and result.endswith("```"):
+                result = result[len("```diff"):-len("```")].strip()
+            elif result.startswith("```think") and result.endswith("```"):
+                result = result[len("```think"):-len("```")].strip()
             elif result.startswith("```") and result.endswith("```"):
                 result = result[len("```"):-len("```")].strip()
             
