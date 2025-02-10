@@ -94,7 +94,6 @@ To inspect the generated nGQL queries, check the terminal:
 ### 4. Verify Queries in Nebula Graph
 Queries can be directly executed in Nebula Graph for validation:
 ![Nebula Graph Query](https://github.com/user-attachments/assets/72b07b88-740e-4210-aaaf-823e29bfb3d1)
-![NebulaGraphQAChain](http://doc.cnlangchain.com/modules/chains/examples/graph_nebula_qa.html)
 
 ## Contribution
 If you wish to contribute, feel free to fork the repository and submit a pull request.
@@ -102,4 +101,4 @@ If you wish to contribute, feel free to fork the repository and submit a pull re
 ## License
 This project is licensed under the MIT License.
 
-Additionally, this project makes use of [LangChain](https://github.com/hwchase17/langchain), which is licensed under the MIT License.
+Additionally, this project makes use of [LangChain](https://github.com/hwchase17/langchain) and [NebulaGraphQAChain](http://doc.cnlangchain.com/modules/chains/examples/graph_nebula_qa.html), which is licensed under the MIT License.
