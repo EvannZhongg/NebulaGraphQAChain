@@ -60,9 +60,11 @@ def call_chat_api(prompt):
                 print("收到空的响应内容")
                 raise ValueError("Received empty response from API")
             
-            # 新增：去除 Markdown 代码块标记
+            # 去除 Markdown 代码块标记
             if result.startswith("```nebula") and result.endswith("```"):
                 result = result[len("```nebula"):-len("```")].strip()
+            elif result.startswith("```cypher") and result.endswith("```"):
+                result = result[len("```cypher"):-len("```")].strip()
             elif result.startswith("```") and result.endswith("```"):
                 result = result[len("```"):-len("```")].strip()
             
